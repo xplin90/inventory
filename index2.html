@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>庫存掃碼</title>
+<style>
+  :root { --bg:#eceff3; --ink:#1c2530; --mute:#5d6b7a; --line:#c9d1da; --in:#0b6e4f; --out:#b4340a; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.5 "Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif; }
+  main { max-width:480px; margin:0 auto; padding:16px; }
+  h1 { font-size:20px; margin:4px 0 12px; }
+  label { display:block; font-size:14px; color:var(--mute); margin:12px 0 4px; }
+  input { width:100%; padding:12px; font-size:18px; border:1px solid var(--line); border-radius:6px; background:#fff; color:var(--ink); }
+  button { font:inherit; border:0; border-radius:6px; padding:12px 16px; cursor:pointer; }
+  .row { display:flex; gap:8px; }
+  .row > input { flex:1; }
+  .scan { background:var(--ink); color:#fff; }
+  .item { margin-top:12px; padding:12px; background:#fff; border-left:6px solid var(--line); border-radius:4px; display:none; }
+  .item b { display:block; font-size:17px; }
+  .item span { font-size:22px; font-weight:700; }
+  .modes { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
+  .modes button { background:#fff; border:2px solid var(--line); font-size:17px; }
+  .modes button.on.in { background:var(--in); border-color:var(--in); color:#fff; }
+  .modes button.on.out { background:var(--out); border-color:var(--out); color:#fff; }
+  .send { width:100%; margin-top:16px; background:var(--ink); color:#fff; font-size:18px; padding:14px; }
+  .send:disabled { opacity:.4; }
+  #msg { margin-top:12px; min-height:24px; font-weight:600; }
+  #msg.err { color:var(--out); } #msg.ok { color:var(--in); }
+  #reader { margin-top:12px; }
+  [hidden] { display:none !important; }
+  .tabs { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:12px 0 4px; }
+  .tabs button { background:#fff; border:2px solid var(--line); }
+  .tabs button.on { background:var(--ink); border-color:var(--ink); color:#fff; }
+  #bmsg { margin-top:12px; min-height:24px; font-weight:600; white-space:pre-line; }
+  #bmsg.err { color:var(--out); } #bmsg.ok { color:var(--in); }
+  #blist { padding:0; list-style:none; } #blist li { display:flex; justify-content:space-between; gap:8px; align-items:center; padding:8px 0; border-bottom:1px solid var(--line); font-size:15px; }
+  #blist button { background:#fff; border:1px solid var(--line); padding:6px 10px; }
+  button:focus-visible, input:focus-visible { outline:3px solid #2f6fed; outline-offset:2px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>庫存掃碼 / Quét mã kho</h1>
+
+  <label>部門 / Bộ phận</label>
+  <input id="dept">
+  <label>人員 / Nhân viên</label>
+  <input id="person">
+
+  <div class="tabs">
+    <button type="button" id="tab1" class="on">出入庫 / Nhập xuất</button>
+    <button type="button" id="tab2">批量盤點 / Kiểm kê</button>
+  </div>
+
+<div id="single">
+  <label>密碼 / Mật khẩu</label>
+  <input id="pass" type="password" autocomplete="off">
+
+  <label>產品編號 / Số sản phẩm（掃碼槍可直接掃，或按相機）</label>
+  <div class="row">
+    <input id="code" autocomplete="off" autocapitalize="characters">
+    <button class="scan" id="cam" type="button">相機</button>
+  </div>
+  <div id="reader"></div>
+  <div class="item" id="item"><b id="iname"></b>庫存 / Tồn kho：<span id="istock"></span></div>
+
+  <div class="modes">
+    <button type="button" class="in" data-m="IN">入庫 / Nhận được</button>
+    <button type="button" class="out" data-m="OUT">出庫 / Xuất kho</button>
+  </div>
+
+  <label>數量 / Số lượng</label>
+  <input id="qty" type="number" inputmode="decimal" min="0">
+  <label>使用的產品編號 / Số sản phẩm sử dụng（選填）</label>
+  <input id="ref">
+
+  <button class="send" id="send" disabled>送出 / Gửi</button>
+  <div id="msg" role="status"></div>
+</div>
+
+<div id="batch" hidden>
+  <label>管理密碼 / Mật khẩu quản lý</label>
+  <input id="apass" type="password" autocomplete="off">
+  <label>產品編號 / Số sản phẩm</label>
+  <div class="row">
+    <input id="bcode" autocomplete="off" autocapitalize="characters">
+    <button class="scan" id="bcam" type="button">相機</button>
+  </div>
+  <div id="breader"></div>
+  <div class="item" id="bitem"><b id="bname"></b>系統庫存 / Tồn hệ thống：<span id="bstock"></span></div>
+  <label>實際數量 / Số lượng thực tế（Enter 加入清單）</label>
+  <input id="bactual" type="number" inputmode="decimal" min="0">
+  <button class="scan" id="badd" type="button" style="margin-top:8px;width:100%">加入清單 / Thêm</button>
+  <ul id="blist"></ul>
+  <button class="send" id="bsend" disabled>送出盤點調整 / Gửi</button>
+  <div id="bmsg" role="status"></div>
+</div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<script>
+const API_URL = 'https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbwGLZlfYecC1V5Nm8zWTC4NLN4K-GyLoB9gN5l2vMcDnSKoViY50I0WDjkCy4ULYNOT/exec/exec';
+const $ = id => document.getElementById(id);
+let mode = null, found = null, scanner = null;
+
+for (const k of ['pass', 'dept', 'person']) {
+  try { $(k).value = localStorage.getItem('inv_' + k) || ''; } catch (e) {}
+  $(k).addEventListener('change', () => { try { localStorage.setItem('inv_' + k, $(k).value); } catch (e) {} });
+}
+
+function say(t, cls) { $('msg').textContent = t; $('msg').className = cls || ''; }
+function refresh() { $('send').disabled = !(found && mode && Number($('qty').value) > 0); }
+
+async function lookup() {
+  const c = $('code').value.trim();
+  found = null; $('item').style.display = 'none'; refresh();
+  if (!c) return;
+  say('查詢中…');
+  try {
+    const r = await (await fetch(API_URL + '?code=' + encodeURIComponent(c) + '&pass=' + encodeURIComponent($('pass').value))).json();
+    if (!r.ok) return say(r.error, 'err');
+    found = r.item; $('code').value = r.item.code;
+    $('iname').textContent = r.item.name; $('istock').textContent = r.item.stock;
+    $('item').style.display = 'block'; say(''); refresh(); $('qty').focus();
+  } catch (e) { say('連線失敗，請檢查網路', 'err'); }
+}
+
+$('code').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); lookup(); } });
+$('qty').addEventListener('input', refresh);
+document.querySelectorAll('.modes button').forEach(b => b.addEventListener('click', () => {
+  mode = b.dataset.m;
+  document.querySelectorAll('.modes button').forEach(x => x.classList.toggle('on', x === b));
+  refresh();
+}));
+
+async function toggleCam(rid, onText) {
+  const out = rid === 'reader' ? say : bsay;
+  if (scanner) { await scanner.stop(); scanner = null; $('reader').innerHTML = $('breader').innerHTML = ''; return; }
+  scanner = new Html5Qrcode(rid);
+  try {
+    await scanner.start({ facingMode: 'environment' }, { fps: 10, qrbox: { width: 300, height: 120 } }, async text => {
+      await scanner.stop(); scanner = null; $(rid).innerHTML = ''; onText(text);
+    });
+  } catch (e) { scanner = null; out('無法開啟相機，請允許相機權限', 'err'); }
+}
+$('cam').addEventListener('click', () => toggleCam('reader', t => { $('code').value = t; lookup(); }));
+
+$('send').addEventListener('click', async () => {
+  $('send').disabled = true; say('送出中…');
+  try {
+    const r = await (await fetch(API_URL, {
+      method: 'POST', headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ pass: $('pass').value, dept: $('dept').value, person: $('person').value,
+        code: found.code, status: mode, qty: $('qty').value, ref: $('ref').value })
+    })).json();
+    if (!r.ok) { say(r.error, 'err'); return refresh(); }
+    say('已記錄：' + (mode === 'IN' ? '入庫' : '出庫') + ' ' + $('qty').value + '　' + found.code, 'ok');
+    $('code').value = $('qty').value = $('ref').value = ''; found = null;
+    $('item').style.display = 'none'; $('code').focus(); refresh();
+  } catch (e) { say('送出失敗，請確認網路後再按一次', 'err'); refresh(); }
+});
+/* ===== 批量盤點 ===== */
+let bFound = null; const bList = new Map();
+function bsay(t, cls) { $('bmsg').textContent = t; $('bmsg').className = cls || ''; }
+function bRender() {
+  $('blist').innerHTML = '';
+  bList.forEach((v, k) => {
+    const li = document.createElement('li');
+    li.textContent = k + '　' + v.stock + ' → ' + v.target;
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = '移除';
+    b.onclick = () => { bList.delete(k); bRender(); };
+    li.append(b); $('blist').append(li);
+  });
+  $('bsend').disabled = bList.size === 0;
+}
+async function bLookup() {
+  const c = $('bcode').value.trim(); bFound = null; $('bitem').style.display = 'none';
+  if (!c) return;
+  bsay('查詢中…');
+  try {
+    const r = await (await fetch(API_URL + '?code=' + encodeURIComponent(c) + '&pass=' + encodeURIComponent($('apass').value))).json();
+    if (!r.ok) return bsay(r.error, 'err');
+    bFound = r.item; $('bcode').value = r.item.code;
+    $('bname').textContent = r.item.name; $('bstock').textContent = r.item.stock;
+    $('bitem').style.display = 'block'; bsay(''); $('bactual').focus();
+  } catch (e) { bsay('連線失敗，請檢查網路', 'err'); }
+}
+function bAdd() {
+  const t = $('bactual').value;
+  if (!bFound || t === '' || Number(t) < 0) return bsay('請先查到編號並填入實際數量', 'err');
+  bList.set(bFound.code, { stock: bFound.stock, target: Number(t) });
+  bFound = null; $('bitem').style.display = 'none'; $('bcode').value = $('bactual').value = '';
+  bsay(''); bRender(); $('bcode').focus();
+}
+$('bcode').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); bLookup(); } });
+$('bactual').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); bAdd(); } });
+$('badd').addEventListener('click', bAdd);
+$('bcam').addEventListener('click', () => toggleCam('breader', t => { $('bcode').value = t; bLookup(); }));
+$('bsend').addEventListener('click', async () => {
+  $('bsend').disabled = true; bsay('送出中…');
+  const items = [...bList].map(([code, v]) => ({ code, target: v.target }));
+  try {
+    const r = await (await fetch(API_URL, {
+      method: 'POST', headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'adjust', pass: $('apass').value, dept: $('dept').value, person: $('person').value, items })
+    })).json();
+    if (!r.ok) { bsay(r.error, 'err'); return bRender(); }
+    bsay(r.results.map(x => x.code + '：' + x.result).join('\n'), 'ok'); bList.clear(); bRender();
+  } catch (e) { bsay('送出失敗，請確認網路後再按一次', 'err'); bRender(); }
+});
+
+function showTab(n) {
+  if (scanner) { scanner.stop(); scanner = null; $('reader').innerHTML = $('breader').innerHTML = ''; }
+  $('single').hidden = n !== 1; $('batch').hidden = n !== 2;
+  $('tab1').classList.toggle('on', n === 1); $('tab2').classList.toggle('on', n === 2);
+}
+$('tab1').addEventListener('click', () => showTab(1));
+$('tab2').addEventListener('click', () => showTab(2));
+</script>
+</body>
+</html>
