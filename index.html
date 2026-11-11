@@ -100,7 +100,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
-const API_URL = 'https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbwGLZlfYecC1V5Nm8zWTC4NLN4K-GyLoB9gN5l2vMcDnSKoViY50I0WDjkCy4ULYNOT/exec/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbwGLZlfYecC1V5Nm8zWTC4NLN4K-GyLoB9gN5l2vMcDnSKoViY50I0WDjkCy4ULYNOT/exec';
 const $ = id => document.getElementById(id);
 let mode = null, found = null, scanner = null;
 
@@ -137,9 +137,17 @@ document.querySelectorAll('.modes button').forEach(b => b.addEventListener('clic
 async function toggleCam(rid, onText) {
   const out = rid === 'reader' ? say : bsay;
   if (scanner) { await scanner.stop(); scanner = null; $('reader').innerHTML = $('breader').innerHTML = ''; return; }
-  scanner = new Html5Qrcode(rid);
+  const F = Html5QrcodeSupportedFormats;
+  scanner = new Html5Qrcode(rid, {
+    formatsToSupport: [F.QR_CODE, F.EAN_13, F.EAN_8, F.UPC_A, F.UPC_E, F.CODE_128, F.CODE_39, F.CODE_93, F.ITF, F.CODABAR],
+    experimentalFeatures: { useBarCodeDetectorIfSupported: true }
+  });
   try {
-    await scanner.start({ facingMode: 'environment' }, { fps: 10, qrbox: { width: 300, height: 120 } }, async text => {
+    await scanner.start({ facingMode: 'environment' }, {
+      fps: 10,
+      qrbox: (w, h) => ({ width: Math.floor(w * 0.9), height: Math.floor(Math.min(h, w) * 0.5) }),
+      videoConstraints: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 }, focusMode: 'continuous' }
+    }, async text => {
       await scanner.stop(); scanner = null; $(rid).innerHTML = ''; onText(text);
     });
   } catch (e) { scanner = null; out('無法開啟相機，請允許相機權限', 'err'); }
