@@ -28,23 +28,6 @@
   #msg { margin-top:12px; min-height:24px; font-weight:600; }
   #msg.err { color:var(--out); } #msg.ok { color:var(--in); }
   #reader { margin-top:12px; }
-  [hidden] { display:none !important; }
-  .tabs { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:12px 0 4px; }
-  .tabs button { padding:10px 4px; font-size:14px; }
-  .tabs button { background:#fff; border:2px solid var(--line); }
-  .tabs button.on { background:var(--ink); border-color:var(--ink); color:#fff; }
-  #bmsg { margin-top:12px; min-height:24px; font-weight:600; white-space:pre-line; }
-  #bmsg.err { color:var(--out); } #bmsg.ok { color:var(--in); }
-  #blist { padding:0; list-style:none; } #blist li { display:flex; justify-content:space-between; gap:8px; align-items:center; padding:8px 0; border-bottom:1px solid var(--line); font-size:15px; }
-  #blist button { background:#fff; border:1px solid var(--line); padding:6px 10px; }
-  #mmsg { margin-top:12px; min-height:24px; font-weight:600; white-space:pre-line; }
-  #mmsg.err { color:var(--out); } #mmsg.ok { color:var(--in); }
-  #mlist { padding:0; list-style:none; } #mlist li { display:flex; justify-content:space-between; gap:8px; align-items:center; padding:8px 0; border-bottom:1px solid var(--line); font-size:15px; }
-  #mlist button { background:#fff; border:1px solid var(--line); padding:6px 10px; }
-  #nmsg { margin-top:12px; min-height:24px; font-weight:600; white-space:pre-line; }
-  #nmsg.err { color:var(--out); } #nmsg.ok { color:var(--in); }
-  #nlist { padding:0; list-style:none; } #nlist li { display:flex; justify-content:space-between; gap:8px; align-items:center; padding:8px 0; border-bottom:1px solid var(--line); font-size:14px; }
-  #nlist button { background:#fff; border:1px solid var(--line); padding:6px 10px; }
   button:focus-visible, input:focus-visible { outline:3px solid #2f6fed; outline-offset:2px; }
 </style>
 </head>
@@ -52,21 +35,12 @@
 <main>
   <h1>庫存掃碼 / Quét mã kho</h1>
 
+  <label>密碼 / Mật khẩu</label>
+  <input id="pass" type="password" autocomplete="off">
   <label>部門 / Bộ phận</label>
   <input id="dept">
   <label>人員 / Nhân viên</label>
   <input id="person">
-
-  <div class="tabs">
-    <button type="button" id="tab1" class="on">出入庫<br>Nhập xuất</button>
-    <button type="button" id="tab3">批量出入庫<br>Nhiều mã</button>
-    <button type="button" id="tab2">批量盤點<br>Kiểm kê</button>
-    <button type="button" id="tab4">新增材料<br>Thêm vật liệu</button>
-  </div>
-
-<div id="single">
-  <label>密碼 / Mật khẩu</label>
-  <input id="pass" type="password" autocomplete="off">
 
   <label>產品編號 / Số sản phẩm（掃碼槍可直接掃，或按相機）</label>
   <div class="row">
@@ -88,72 +62,6 @@
 
   <button class="send" id="send" disabled>送出 / Gửi</button>
   <div id="msg" role="status"></div>
-</div>
-
-<div id="multi" hidden>
-  <label>密碼 / Mật khẩu</label>
-  <input id="mpass" type="password" autocomplete="off">
-  <div class="modes mm">
-    <button type="button" class="in" data-m="IN">入庫 / Nhận được</button>
-    <button type="button" class="out" data-m="OUT">出庫 / Xuất kho</button>
-  </div>
-  <label>使用的產品編號 / Số sản phẩm sử dụng（選填，整批共用）</label>
-  <input id="mref">
-  <label>產品編號 / Số sản phẩm</label>
-  <div class="row">
-    <input id="mcode" autocomplete="off" autocapitalize="characters">
-    <button class="scan" id="mcam" type="button">相機</button>
-  </div>
-  <div id="mreader"></div>
-  <div class="item" id="mitem"><b id="mname"></b>庫存 / Tồn kho：<span id="mstock"></span></div>
-  <label>數量 / Số lượng（Enter 加入清單）</label>
-  <input id="mqty" type="number" inputmode="decimal" min="0">
-  <button class="scan" id="madd" type="button" style="margin-top:8px;width:100%">加入清單 / Thêm</button>
-  <ul id="mlist"></ul>
-  <button class="send" id="msend" disabled>送出全部 / Gửi tất cả</button>
-  <div id="mmsg" role="status"></div>
-</div>
-
-<div id="addm" hidden>
-  <label>新增材料密碼 / Mật khẩu thêm vật liệu</label>
-  <input id="npass" type="password" autocomplete="off">
-  <label>材料編號 / Mã vật liệu</label>
-  <div class="row">
-    <input id="ncode" autocomplete="off" autocapitalize="characters">
-    <button class="scan" id="ncam" type="button">相機</button>
-  </div>
-  <div id="nreader"></div>
-  <label>品名規格 / Tên, quy cách</label>
-  <input id="nname">
-  <label>部門 / Bộ phận</label>
-  <input id="ndept" list="dl-dept">
-  <datalist id="dl-dept"></datalist>
-  <label>類別 / Loại（Enter 加入清單）</label>
-  <input id="ncat" list="dl-cat">
-  <datalist id="dl-cat"></datalist>
-  <button class="scan" id="nadd" type="button" style="margin-top:8px;width:100%">加入清單 / Thêm</button>
-  <ul id="nlist"></ul>
-  <button class="send" id="nsend" disabled>新增到主檔 / Thêm vào danh mục</button>
-  <div id="nmsg" role="status"></div>
-</div>
-
-<div id="batch" hidden>
-  <label>管理密碼 / Mật khẩu quản lý</label>
-  <input id="apass" type="password" autocomplete="off">
-  <label>產品編號 / Số sản phẩm</label>
-  <div class="row">
-    <input id="bcode" autocomplete="off" autocapitalize="characters">
-    <button class="scan" id="bcam" type="button">相機</button>
-  </div>
-  <div id="breader"></div>
-  <div class="item" id="bitem"><b id="bname"></b>系統庫存 / Tồn hệ thống：<span id="bstock"></span></div>
-  <label>實際數量 / Số lượng thực tế（Enter 加入清單）</label>
-  <input id="bactual" type="number" inputmode="decimal" min="0">
-  <button class="scan" id="badd" type="button" style="margin-top:8px;width:100%">加入清單 / Thêm</button>
-  <ul id="blist"></ul>
-  <button class="send" id="bsend" disabled>送出盤點調整 / Gửi</button>
-  <div id="bmsg" role="status"></div>
-</div>
 </main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
@@ -162,7 +70,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbwGLZlfYecC1V5Nm8zWTC4N
 const $ = id => document.getElementById(id);
 let mode = null, found = null, scanner = null;
 
-for (const k of ['pass', 'mpass', 'npass', 'dept', 'person']) {
+for (const k of ['pass', 'dept', 'person']) {
   try { $(k).value = localStorage.getItem('inv_' + k) || ''; } catch (e) {}
   $(k).addEventListener('change', () => { try { localStorage.setItem('inv_' + k, $(k).value); } catch (e) {} });
 }
@@ -186,23 +94,22 @@ async function lookup() {
 
 $('code').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); lookup(); } });
 $('qty').addEventListener('input', refresh);
-document.querySelectorAll('#single .modes button').forEach(b => b.addEventListener('click', () => {
+document.querySelectorAll('.modes button').forEach(b => b.addEventListener('click', () => {
   mode = b.dataset.m;
-  document.querySelectorAll('#single .modes button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('.modes button').forEach(x => x.classList.toggle('on', x === b));
   refresh();
 }));
 
-async function toggleCam(rid, onText) {
-  const out = { reader: say, breader: bsay, mreader: msay, nreader: nsay }[rid];
-  if (scanner) { await scanner.stop(); scanner = null; $('reader').innerHTML = $('breader').innerHTML = $('mreader').innerHTML = $('nreader').innerHTML = ''; return; }
-  scanner = new Html5Qrcode(rid);
+$('cam').addEventListener('click', async () => {
+  if (scanner) { await scanner.stop(); scanner = null; $('reader').innerHTML = ''; return; }
+  scanner = new Html5Qrcode('reader');
   try {
     await scanner.start({ facingMode: 'environment' }, { fps: 10, qrbox: { width: 300, height: 120 } }, async text => {
-      await scanner.stop(); scanner = null; $(rid).innerHTML = ''; onText(text);
+      await scanner.stop(); scanner = null; $('reader').innerHTML = '';
+      $('code').value = text; lookup();
     });
-  } catch (e) { scanner = null; out('無法開啟相機，請允許相機權限', 'err'); }
-}
-$('cam').addEventListener('click', () => toggleCam('reader', t => { $('code').value = t; lookup(); }));
+  } catch (e) { scanner = null; say('無法開啟相機，請允許相機權限', 'err'); }
+});
 
 $('send').addEventListener('click', async () => {
   $('send').disabled = true; say('送出中…');
@@ -218,172 +125,6 @@ $('send').addEventListener('click', async () => {
     $('item').style.display = 'none'; $('code').focus(); refresh();
   } catch (e) { say('送出失敗，請確認網路後再按一次', 'err'); refresh(); }
 });
-/* ===== 批量盤點 ===== */
-let bFound = null; const bList = new Map();
-function bsay(t, cls) { $('bmsg').textContent = t; $('bmsg').className = cls || ''; }
-function bRender() {
-  $('blist').innerHTML = '';
-  bList.forEach((v, k) => {
-    const li = document.createElement('li');
-    li.textContent = k + '　' + v.stock + ' → ' + v.target;
-    const b = document.createElement('button'); b.type = 'button'; b.textContent = '移除';
-    b.onclick = () => { bList.delete(k); bRender(); };
-    li.append(b); $('blist').append(li);
-  });
-  $('bsend').disabled = bList.size === 0;
-}
-async function bLookup() {
-  const c = $('bcode').value.trim(); bFound = null; $('bitem').style.display = 'none';
-  if (!c) return;
-  bsay('查詢中…');
-  try {
-    const r = await (await fetch(API_URL + '?code=' + encodeURIComponent(c) + '&pass=' + encodeURIComponent($('apass').value))).json();
-    if (!r.ok) return bsay(r.error, 'err');
-    bFound = r.item; $('bcode').value = r.item.code;
-    $('bname').textContent = r.item.name; $('bstock').textContent = r.item.stock;
-    $('bitem').style.display = 'block'; bsay(''); $('bactual').focus();
-  } catch (e) { bsay('連線失敗，請檢查網路', 'err'); }
-}
-function bAdd() {
-  const t = $('bactual').value;
-  if (!bFound || t === '' || Number(t) < 0) return bsay('請先查到編號並填入實際數量', 'err');
-  bList.set(bFound.code, { stock: bFound.stock, target: Number(t) });
-  bFound = null; $('bitem').style.display = 'none'; $('bcode').value = $('bactual').value = '';
-  bsay(''); bRender(); $('bcode').focus();
-}
-$('bcode').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); bLookup(); } });
-$('bactual').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); bAdd(); } });
-$('badd').addEventListener('click', bAdd);
-$('bcam').addEventListener('click', () => toggleCam('breader', t => { $('bcode').value = t; bLookup(); }));
-$('bsend').addEventListener('click', async () => {
-  $('bsend').disabled = true; bsay('送出中…');
-  const items = [...bList].map(([code, v]) => ({ code, target: v.target }));
-  try {
-    const r = await (await fetch(API_URL, {
-      method: 'POST', headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action: 'adjust', pass: $('apass').value, dept: $('dept').value, person: $('person').value, items })
-    })).json();
-    if (!r.ok) { bsay(r.error, 'err'); return bRender(); }
-    bsay(r.results.map(x => x.code + '：' + x.result).join('\n'), 'ok'); bList.clear(); bRender();
-  } catch (e) { bsay('送出失敗，請確認網路後再按一次', 'err'); bRender(); }
-});
-
-/* ===== 批量出入庫 ===== */
-let mFound = null, mMode = null; const mList = new Map();
-function msay(t, cls) { $('mmsg').textContent = t; $('mmsg').className = cls || ''; }
-function mRender() {
-  $('mlist').innerHTML = '';
-  mList.forEach((v, k) => {
-    const li = document.createElement('li');
-    li.textContent = k + '　' + v.name + '　× ' + v.qty;
-    const b = document.createElement('button'); b.type = 'button'; b.textContent = '移除';
-    b.onclick = () => { mList.delete(k); mRender(); };
-    li.append(b); $('mlist').append(li);
-  });
-  $('msend').disabled = !(mList.size && mMode);
-}
-async function mLookup() {
-  const c = $('mcode').value.trim(); mFound = null; $('mitem').style.display = 'none';
-  if (!c) return;
-  msay('查詢中…');
-  try {
-    const r = await (await fetch(API_URL + '?code=' + encodeURIComponent(c) + '&pass=' + encodeURIComponent($('mpass').value))).json();
-    if (!r.ok) return msay(r.error, 'err');
-    mFound = r.item; $('mcode').value = r.item.code;
-    $('mname').textContent = r.item.name; $('mstock').textContent = r.item.stock;
-    $('mitem').style.display = 'block'; msay(''); $('mqty').focus();
-  } catch (e) { msay('連線失敗，請檢查網路', 'err'); }
-}
-function mAdd() {
-  const q = Number($('mqty').value);
-  if (!mFound || !(q > 0)) return msay('請先查到編號並填入數量', 'err');
-  const old = mList.get(mFound.code);  // 同一編號重複加入時數量累加
-  mList.set(mFound.code, { name: mFound.name, qty: (old ? old.qty : 0) + q });
-  mFound = null; $('mitem').style.display = 'none'; $('mcode').value = $('mqty').value = '';
-  msay(''); mRender(); $('mcode').focus();
-}
-$('mcode').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); mLookup(); } });
-$('mqty').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); mAdd(); } });
-$('madd').addEventListener('click', mAdd);
-$('mcam').addEventListener('click', () => toggleCam('mreader', t => { $('mcode').value = t; mLookup(); }));
-document.querySelectorAll('#multi .modes button').forEach(b => b.addEventListener('click', () => {
-  mMode = b.dataset.m;
-  document.querySelectorAll('#multi .modes button').forEach(x => x.classList.toggle('on', x === b));
-  mRender();
-}));
-$('msend').addEventListener('click', async () => {
-  $('msend').disabled = true; msay('送出中…');
-  const items = [...mList].map(([code, v]) => ({ code, qty: v.qty }));
-  try {
-    const r = await (await fetch(API_URL, {
-      method: 'POST', headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action: 'batch', pass: $('mpass').value, status: mMode, dept: $('dept').value,
-        person: $('person').value, ref: $('mref').value, items })
-    })).json();
-    if (!r.ok) { msay(r.error, 'err'); return mRender(); }
-    msay(r.results.map(x => x.code + '：' + x.result).join('\n'), 'ok'); mList.clear(); mRender();
-  } catch (e) { msay('送出失敗，請確認網路後再按一次', 'err'); mRender(); }
-});
-
-/* ===== 批量新增材料 ===== */
-let nList = [];
-const nkey = c => c.replace(/[\s-]/g, '').toUpperCase();
-function nsay(t, cls) { $('nmsg').textContent = t; $('nmsg').className = cls || ''; }
-function nRender() {
-  $('nlist').innerHTML = '';
-  nList.forEach((v, i) => {
-    const li = document.createElement('li');
-    li.textContent = v.code + '　' + v.name + '　[' + (v.dept || '-') + ' / ' + (v.cat || '-') + ']';
-    const b = document.createElement('button'); b.type = 'button'; b.textContent = '移除';
-    b.onclick = () => { nList.splice(i, 1); nRender(); };
-    li.append(b); $('nlist').append(li);
-  });
-  $('nsend').disabled = nList.length === 0;
-}
-function fillList(id, arr) {
-  $(id).innerHTML = '';
-  arr.forEach(x => { const o = document.createElement('option'); o.value = x; $(id).append(o); });
-}
-async function nLoadLists() {
-  if (!$('npass').value) return;
-  try {
-    const r = await (await fetch(API_URL + '?action=lists&pass=' + encodeURIComponent($('npass').value))).json();
-    if (!r.ok) return nsay(r.error, 'err');
-    fillList('dl-dept', r.depts); fillList('dl-cat', r.cats); nsay('');
-  } catch (e) { nsay('連線失敗，請檢查網路', 'err'); }
-}
-function nAdd() {
-  const code = $('ncode').value.trim(), name = $('nname').value.trim();
-  if (!code || !name) return nsay('材料編號與品名規格必填', 'err');
-  if (nList.some(v => nkey(v.code) === nkey(code))) return nsay('清單裡已有這個編號', 'err');
-  nList.push({ code, name, dept: $('ndept').value.trim(), cat: $('ncat').value.trim() });
-  $('ncode').value = $('nname').value = ''; nsay(''); nRender(); $('ncode').focus();
-}
-$('npass').addEventListener('change', nLoadLists);
-$('ncat').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); nAdd(); } });
-$('nadd').addEventListener('click', nAdd);
-$('ncam').addEventListener('click', () => toggleCam('nreader', t => { $('ncode').value = t; $('nname').focus(); }));
-$('nsend').addEventListener('click', async () => {
-  $('nsend').disabled = true; nsay('送出中…');
-  try {
-    const r = await (await fetch(API_URL, {
-      method: 'POST', headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action: 'addmaster', pass: $('npass').value, items: nList })
-    })).json();
-    if (!r.ok) { nsay(r.error, 'err'); return nRender(); }
-    nsay(r.results.map(x => x.code + '：' + x.result).join('\n'), 'ok'); nList = []; nRender(); nLoadLists();
-  } catch (e) { nsay('送出失敗，請確認網路後再按一次', 'err'); nRender(); }
-});
-
-function showTab(n) {
-  if (scanner) { scanner.stop(); scanner = null; $('reader').innerHTML = $('breader').innerHTML = $('mreader').innerHTML = $('nreader').innerHTML = ''; }
-  $('single').hidden = n !== 1; $('batch').hidden = n !== 2; $('multi').hidden = n !== 3; $('addm').hidden = n !== 4;
-  $('tab1').classList.toggle('on', n === 1); $('tab2').classList.toggle('on', n === 2); $('tab3').classList.toggle('on', n === 3); $('tab4').classList.toggle('on', n === 4);
-}
-$('tab1').addEventListener('click', () => showTab(1));
-$('tab2').addEventListener('click', () => showTab(2));
-$('tab3').addEventListener('click', () => showTab(3));
-$('tab4').addEventListener('click', () => showTab(4));
 </script>
 </body>
 </html>
